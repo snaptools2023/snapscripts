@@ -43,8 +43,7 @@ Using these values, a list of cheapest cards to upgrade is produced.
 ### Example
 
 ```
-PS > cd .\cardupgrade\
-PS > .\cardupgrade.ps1
+PS > .\List-CardsToUpgrade.ps1
 Giganto requires 5 boosters to upgrade from Common to Uncommon for 25 credits
 Polaris requires 5 boosters to upgrade from Common to Uncommon for 25 credits
 Hood requires 10 boosters to upgrade from Uncommon to Rare for 100 credits
@@ -87,8 +86,7 @@ Using these values, it creates a json representation of the deck and seriailzes 
 ### Example
 
 ```
-PS > cd .\export-all-decks-serialized\
-PS > .\export-all-decks-serialized.ps1
+PS > .\Export-AllDecksForSharing.ps1
 
 <in the file alldecks-20230728T223334.txt> (files are timestamped)
 Deck:  Destroy

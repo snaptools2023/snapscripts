@@ -1,8 +1,8 @@
 # snapscripts
 Misc scripts for marvel snap.
 
-* [List-CardsToUpgrade.ps1](#list-cardstoupgrade.ps1)
-* [Export-AllDecksForSharing.ps1](#export-alldecksforsharing.ps1)
+* [List-CardsToUpgrade.ps1](#list-cardstoupgradeps1)
+* [Export-AllDecksForSharing.ps1](#export-alldecksforsharingps1)
 
 ## List-CardsToUpgrade.ps1
 

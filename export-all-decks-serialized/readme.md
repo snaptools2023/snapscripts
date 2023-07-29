@@ -69,7 +69,3 @@ The ShopState.json and possibly CollectionState.json files are only updated afte
 I build this on a windows machine and wanted to have the lowest barier to entry.  There is no magic here and the script is tiny.  This could easily be node, python or any other language.  Also, I am not the best Powersheller out there so this script might not be up to your standards.
 
 I have not tested this on any other platforms and it works on my machine.
-
-# Warning
-
-I use this script.  You are welcome to use it at your own risk.  Validate the output before you delete your decks.

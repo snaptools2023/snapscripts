@@ -1,11 +1,23 @@
-#
-#
-# The data files seem to only refrsh after starting a new game or restarting the app.  So, to get afresh list, you need to do one of those things.
-#
-# todo:  take the output file as a parameter
-#
+<#
+.SYNOPSIS
+  Export all marvel snap decks for sharing.
+.DESCRIPTION
+  Export all marvel snap decks for sharing.
+.OUTPUTS
+  Export text file in the local directory with the name "alldecks-yyyyMMddHHmmss.txt" where yyyyMMddHHmmss is a timestamp.
+.NOTES
+  Version:        1.0
+  Author:         snaptools2023
+  Creation Date:  2023-07-28
+  Purpose/Change: Initial script
 
-$timestamp = (get-date).ToString("yyyyMMddTHHmmss")
+  * The data files seem to only refrsh after starting a new game or restarting the app.  So, to get afresh list, you need to do one of those things.
+  * todo:  take the output file as a parameter
+.EXAMPLE
+  Export-AllDecksForSharing.ps1
+#>
+
+$timestamp = (get-date).ToString("yyyyMMddHHmmss")
 $outputFile = "alldecks-$timestamp.txt"
 
 # snap data root path.  This is my path on windows 10 using environment variables for the username.

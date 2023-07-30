@@ -2,7 +2,8 @@
 Misc scripts for marvel snap.
 
 * [List-CardsToUpgrade.ps1](#list-cardstoupgradeps1)
-* [Export-AllDecksForSharing.ps1](#export-alldecksforsharingps1)
+* [Export-DecksForSharing.ps1](#export-decksforsharingps1)
+* [Export-DecksAsHtml.ps1](#export-decksashtmlps1)
 
 ## List-CardsToUpgrade.ps1
 
@@ -65,11 +66,11 @@ TheCollector requires 50 boosters to upgrade from UltraLegendary to Infinity for
 AmericaChavez requires 50 boosters to upgrade from UltraLegendary to Infinity for 500 credits
 ```
 
-## Export-AllDecksForSharing.ps1
+## Export-DecksForSharing.ps1
 
 ### What this script does.
 
-Powershell script to export all of your decks to a text file, including names and the serialized string for importing into snap.  This is a basic "backup" script or a way to share all your decks.
+Powershell script to export your decks to a text file, including names and the serialized string for importing into snap.  This is a basic "backup" script or a way to share all your decks.
 
 ### How does it work?
 
@@ -86,7 +87,7 @@ Using these values, it creates a json representation of the deck and seriailzes 
 ### Example
 
 ```
-PS > .\Export-AllDecksForSharing.ps1
+PS > .\Export-DecksForSharing.ps1
 
 <in the file alldecks-20230728T223334.txt> (files are timestamped)
 Deck:  Destroy
@@ -122,14 +123,38 @@ eyJDYXJkcyI6W3siQ2FyZERlZklkIjoiQW1lcmljYUNoYXZleiJ9LHsiQ2FyZERlZklkIjoiRHJEb29t
 
 ```
 
-# Limitations
+## Export-DecksAsHtml.ps1
+
+### What this script does.
+
+Powershell script to export your decks to an html file, including names and the serialized string for importing into snap.  This is a basic "backup" script or a way to share all your decks and view them as a web page.
+
+### How does it work?
+
+This script looks at only your local files.  It does not send or receive data from any server.
+
+The file it looks at is:
+
+* '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod\CollectionState.json'
+
+CollectionState.json is parsed to identify your decks and cards.
+
+Using these values, it creates a json representation of the deck and seriailzes it to a string that you can paste into Snap.
+
+### Example
+
+```
+PS > .\Export-DecksAsHtml.ps1
+```
+
+## Limitations
 
 The ShopState.json and possibly CollectionState.json files are only updated after you play a game in Marvel Snap.  So, you will upgrade your cards and rerunning the script will not refresh the data.  Play a game first, then it will update.  I just go through the list until I run out of credits, but I'm not the best min/max player out there.
 
-# Why Powershell
+## Why Powershell
 
 I build this on a windows machine and wanted to have the lowest barier to entry.  There is no magic here and the script is tiny.  This could easily be node, python or any other language.  Also, I am not the best Powersheller out there so this script might not be up to your standards.
 
-# Warning
+## Warning
 
 I use these scripts.  You are welcome to use them at your own risk.  Validate all output before you trust it.

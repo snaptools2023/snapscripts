@@ -1,20 +1,24 @@
 <#
 .SYNOPSIS
-  Lists 
-.DESCRIPTION
-  Powershell script to identify which cards to upgrade to get the most out of your credits and boosters.
-.OUTPUTS
-  Powershell script to identify which cards to upgrade to get the most out of your credits and boosters.
-.NOTES
-  Version:        1.0
-  Author:         snaptools2023
-  Creation Date:  2023-07-27
-  Purpose/Change: Initial script
+	Lists 
 
-  * The data files seem to only refrsh after starting a new game or restarting the app.  So, to get afresh list, you need to do one of those things.
-  * todo:  output to file based on parameter?
+.DESCRIPTION
+	Powershell script to identify which cards to upgrade to get the most out of your credits and boosters.
+
+.OUTPUTS
+	Powershell script to identify which cards to upgrade to get the most out of your credits and boosters.
+
+.NOTES
+	Version: 1.0
+	Author: snaptools2023
+	Creation Date: 2023-07-27
+	Purpose/Change: Initial script
+
+	* The data files seem to only refrsh after starting a new game or restarting the app.	So, to get afresh list, you need to do one of those things.
+	* todo:	output to file based on parameter?
+
 .EXAMPLE
-  Export-AllDecksForSharing.ps1
+	Export-AllDecksForSharing.ps1
 #>
 
 # boosters and credits required per card rank upgrade
@@ -63,7 +67,7 @@ $boosterLevels = @(
 	}
 )
 
-# snap data root path.  This is my path on windows 10 using environment variables for the username.
+# snap data root path.	This is my path on windows 10 using environment variables for the username.
 $snapDataPath = Join-Path $env:USERPROFILE '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod'
 $shopStatePath = Join-Path $snapDataPath "ShopState.json"
 $collectionStatePath = Join-Path $snapDataPath "CollectionState.json"
@@ -87,7 +91,8 @@ foreach ($card in $cards) {
 	# verify that the card actually has a boosters value befor using it - otherwise, assume 0
 	if (Get-Member -inputobject $cardDefStats.PSObject.Properties[$card.CardDefId].Value -name "Boosters" -Membertype Properties) {
 		$availableBoosters = $cardDefStats.PSObject.Properties[$card.CardDefId].Value.Boosters
-	} else {
+	}
+ else {
 		$availableBoosters = 0
 	}
 

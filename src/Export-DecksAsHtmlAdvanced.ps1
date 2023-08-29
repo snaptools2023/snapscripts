@@ -14,11 +14,17 @@
 
 	* The data files seem to only refrsh after starting a new game or restarting the app.	So, to get afresh list, you need to do one of those things.
 
+	* todo:  the output does not show the variant in use.
+	* todo:  the output does not show the upgrade level of the card.
+
 .PARAMETER DeckName
 	The name of the deck to export.	If no deck name is given, all decks are exported.
 
 .PARAMETER OutputFilename
 	The name of file to write the export to.
+
+.PARAMETER UseImages
+	Boolean to use images in the export or not.
 
 .EXAMPLE
 	Export-DecksAsHtmlAdvanced.ps1 
@@ -42,7 +48,7 @@
 #
 # parameters and validation/defaults
 #
-param ([string] $DeckName, [string] $OutputFilename)
+param ([string] $DeckName, [string] $OutputFilename, [bool] $UseImages)
 
 Set-StrictMode -Version 1
 
@@ -56,34 +62,18 @@ if ('' -eq $DeckName) {
 }
 
 #
-# functions
+# imports functions
 #
-# https://www.bricelam.net/2012/09/simple-template-engine-for-powershell.html
-# Merge-Tokens 'Hello, $target$! My name is $self$.' @{
-# 	Target = 'World'
-# 	Self = 'Brice'
-# }
-function Merge-Tokens($template, $tokens) {
-    return [regex]::Replace($template, '\$(?<tokenName>\w+)\$', {
-            param($match)
-
-            $tokenName = $match.Groups['tokenName'].Value
-
-            return $tokens[$tokenName]
-        })
-}
-
-function Load-Template($templateName) {
-	$path = $MyInvocation.ScriptName
-	$path = Split-Path $path -Parent
-	$path = Join-Path $path "_Export-DecksAsHtmlAdvanced-Templates\$templateName.html" # todo:  windows only here. fix this later
-	$templateContent = Get-Content -Path $path -Raw
-	return $templateContent
-}
+. "$(Join-Path -Path $PSScriptRoot -ChildPath "_functions.ps1")"
 
 #
 # main script
 #
+
+$cardDatabase = $null
+if ($true -eq $UseImages) {
+	$cardDatabase = Get-CardsFromInternet
+}
 
 # snap data root path.  This is my path on windows 10 using environment variables for the username.
 $snapDataPath = Join-Path $env:USERPROFILE '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod'
@@ -110,8 +100,15 @@ foreach ($deck in $decks) {
 		$htmlCards = ""
 
 		foreach ($card in $deck.Cards) {
+
+			$imageUrl = ""
+			if ($true -eq $UseImages) { 
+				$imageUrl = "https://static.marvelsnap.pro/cards/$($card.CardDefId).webp"
+			}
+
 			$htmlCards += Merge-Tokens -template $htmlCardTemplate -tokens @{ 
 				CardDefId = $card.CardDefId
+				ImageUrl = $imageUrl
 			}
 
 			# add to array to serialize

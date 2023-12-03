@@ -1,26 +1,24 @@
 <#
 .SYNOPSIS
-	Lists cards to ugrade in the order of cheapest (credits) first.
+	Lists cards to ugrade that are either common or have enough boosters to get to infinite.
 
 .DESCRIPTION
-	Powershell script to identify which cards to upgrade to get the most out of your credits and boosters.
+	Powershell script to identify which cards to upgrade for cheap (common) or all the way to infinite (to get another split)
 
 .OUTPUTS
-	Powershell script to identify which cards to upgrade to get the most out of your credits and boosters.
+	List of cards that are common or can be upgraded to infinite for a split.
 
 .NOTES
-	Version: 1.0 - snaptools2023 - 2023-07-27 - Initial script
-	Version: 1.1 - snaptools2023 - 2023-08-12 - Limit list to 25 cards to upgrade.
-	Version: 1.2 - snaptools2023 - 2023-10-06 - Sort by boosters first, then card name to easily find the ones you want to upgrade.
+	Version: 1.0 - snaptools2023 - 2023-11-03 - Initial script
 
 	* The data files seem to only refrsh after starting a new game or restarting the app.	So, to get afresh list, you need to do one of those things.
 	* todo:	output to file based on parameter?
 
 .EXAMPLE
-		List-CardsToUpgrade.ps1
+		List-CardsToUpgrade2.ps1
 #>
 
-$maxCardsToDisplay = 45
+$maxCardsToDisplay = 145
 
 # boosters and credits required per card rank upgrade
 $boosterLevels = @(
@@ -97,8 +95,20 @@ foreach ($card in $cards) {
 		$availableBoosters = 0
 	}
 
+	# todo:  verify we have enough credits
+
 	# if we have enough boosters for this card and enough credits, add it to the list
-	if ($availableBoosters -ge $boosterLevel.BoostersRequired -and $availableCredits -ge $boosterLevel.CreditsRequired) {
+	if ($boosterLevel.FromRank -eq $boosterLevels[0].FromRank -and $availableCredits -ge $boosterLevels[0].CreditsRequired) {
+		$results += [PSCustomObject] @{ CardDefId = $card.CardDefId; BoostersRequired = $boosterLevel.BoostersRequired; FromRank = $boosterLevel.FromRank; ToRank = $boosterLevel.ToRank; CreditsRequired = $boosterLevel.CreditsRequired }
+	} elseif ($boosterLevel.FromRank -eq $boosterLevels[1].FromRank -and $availableBoosters -ge 145 -and $availableCredits -ge $boosterLevels[1].CreditsRequired) {
+		$results += [PSCustomObject] @{ CardDefId = $card.CardDefId; BoostersRequired = $boosterLevel.BoostersRequired; FromRank = $boosterLevel.FromRank; ToRank = $boosterLevel.ToRank; CreditsRequired = $boosterLevel.CreditsRequired }
+	} elseif ($boosterLevel.FromRank -eq $boosterLevels[2].FromRank -and $availableBoosters -ge 140 -and $availableCredits -ge $boosterLevels[2].CreditsRequired) {
+		$results += [PSCustomObject] @{ CardDefId = $card.CardDefId; BoostersRequired = $boosterLevel.BoostersRequired; FromRank = $boosterLevel.FromRank; ToRank = $boosterLevel.ToRank; CreditsRequired = $boosterLevel.CreditsRequired }
+	} elseif ($boosterLevel.FromRank -eq $boosterLevels[3].FromRank -and $availableBoosters -ge 120 -and $availableCredits -ge $boosterLevels[3].CreditsRequired) {
+		$results += [PSCustomObject] @{ CardDefId = $card.CardDefId; BoostersRequired = $boosterLevel.BoostersRequired; FromRank = $boosterLevel.FromRank; ToRank = $boosterLevel.ToRank; CreditsRequired = $boosterLevel.CreditsRequired }
+	} elseif ($boosterLevel.FromRank -eq $boosterLevels[4].FromRank -and $availableBoosters -ge 90 -and $availableCredits -ge $boosterLevels[4].CreditsRequired) {
+		$results += [PSCustomObject] @{ CardDefId = $card.CardDefId; BoostersRequired = $boosterLevel.BoostersRequired; FromRank = $boosterLevel.FromRank; ToRank = $boosterLevel.ToRank; CreditsRequired = $boosterLevel.CreditsRequired }
+	} elseif ($boosterLevel.FromRank -eq $boosterLevels[5].FromRank -and $availableBoosters -ge 50 -and $availableCredits -ge $boosterLevels[5].CreditsRequired) {
 		$results += [PSCustomObject] @{ CardDefId = $card.CardDefId; BoostersRequired = $boosterLevel.BoostersRequired; FromRank = $boosterLevel.FromRank; ToRank = $boosterLevel.ToRank; CreditsRequired = $boosterLevel.CreditsRequired }
 	}
 }
@@ -113,6 +123,7 @@ foreach ($result in $results) {
 		continue
 	}
 
+	# todo:  this should show what it takes to get to infinite
 	Write-Host "$($result.CardDefId) requires $($result.BoostersRequired) boosters to upgrade from $($result.FromRank) to $($result.ToRank) for $($result.CreditsRequired) credits"
 	$counter++
 }

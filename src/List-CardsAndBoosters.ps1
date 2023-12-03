@@ -10,13 +10,16 @@
 
 .NOTES
 	Version: 1.0 - snaptools2023 - 2023-08-28 - Initial script
+	Version: 1.1 - snaptools2023 - 2023-12-03 - Order by boosters instead of card name
 
 	* The data files seem to only refrsh after starting a new game or restarting the app.	So, to get afresh list, you need to do one of those things.
 	* todo:	output to file based on parameter?
-	* todo: order by name or booster count parameter
 
 .PARAMETER CSV
 	True to export the values as csv
+
+.PARAMETER orderByBooster
+	True to order by booster count instead of name.
 
 .EXAMPLE
 	List-CardsAndBoosters.ps1
@@ -28,9 +31,13 @@
 
 	Exports all cards and their boosters in CSV format.
 
+.EXAMPLE
+	List-CardsAndBoosters.ps1 -orderByBoosters $true
+
+	Exports all cards ordered by boosters.
 #>
 
-param ([bool] $CSV)
+param ([bool] $CSV, [bool] $orderByBooster)
 
 # snap data root path.	This is my path on windows 10 using environment variables for the username.
 $snapDataPath = Join-Path $env:USERPROFILE '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod'
@@ -62,8 +69,12 @@ foreach ($card in $cards) {
 	}
 }
 
-# sort the final list by credits required which will put the cheapest cards at the top.
-$results = @($results | Sort-Object -Property CardDefId)
+if ($true -eq $orderByBooster) {
+	$results = @($results | Sort-Object -Property AvailableBoosters)
+} else {
+	$results = @($results | Sort-Object -Property CardDefId)
+}
+
 
 $previousCardDefId = ""
 

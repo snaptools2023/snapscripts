@@ -7,6 +7,7 @@ Misc scripts for marvel snap.
 * [List-CardsAndBoosters.ps1](#list-cardsandboostersps1)
 * [List-CardsToUpgrade.ps1](#list-cardstoupgradeps1)
 * [List-CardsToUpgrade-wip.ps1](#list-cardstoupgradewipps1)
+* [List-PixelsWithoutSplits.ps1](#list-pixelswithoutsplitsps1)
 
 ## Todo/coming soon - screenshots of html output
 
@@ -241,6 +242,51 @@ HitMonkey requires 50 boosters to upgrade from UltraLegendary to Infinity for 50
 Hobgoblin requires 50 boosters to upgrade from UltraLegendary to Infinity for 500 credits
 TheCollector requires 50 boosters to upgrade from UltraLegendary to Infinity for 500 credits
 AmericaChavez requires 50 boosters to upgrade from UltraLegendary to Infinity for 500 credits
+```
+
+## List-PixelsWithoutSplits.ps1
+
+### What this script does.
+
+Powershell script to identify which of your Pixel variant cards do not yet have a Gold or Ink infinity split, and ranks them by their probability of earning one on the next split.
+
+### How does it work?
+
+This script looks at only your local files.  It does not send or receive data from any server.
+
+The files it looks at are:
+
+* '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod\CollectionState.json'
+* '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod\CharacterMasteryState.json'
+* '.data\all_pixels.txt' (list of all known Pixel variant keys)
+
+CollectionState.json is parsed to identify which Pixel variants you own, how many times each base card has been split, and how many variants you have for each card.
+
+CharacterMasteryState.json is parsed to get the Character Mastery Level for each card, which determines the Rare Finish drop rate.
+
+The probability of earning Gold or Ink on the next split is calculated from two independent components:
+
+* **Base %** — A flat 10% protected chance that applies from the 4th split onward (0% before that).
+* **Mastery %** — The Rare Finish drop rate for the card's Character Mastery Level bracket (54% at level 1-9, 35% at 10-19, 21% at 20-29, 16% at 30+). Only applies when splits >= 3.
+* **Combined %** — `Base% + (1 - Base%) x Mastery%`
+
+Cards are sorted from most likely to least likely to earn Gold or Ink on the next split.
+
+### Example
+
+```
+PS > .\List-PixelsWithoutSplits.ps1
+Pixel cards without a GoldFoil or Ink split (50 of 213):
+
+CardDefId       Splits Mastery Variants Base % Mastery % Combined %
+---------       ------ ------- -------- ------ --------- ----------
+AbsorbingMan         3       9        4 10.0%  54.0%     58.6%
+Dagger               3       9        3 10.0%  54.0%     58.6%
+Daredevil            3       9        4 10.0%  54.0%     58.6%
+Magik                4      16        4 10.0%  35.0%     41.5%
+MrSinister           4      14        6 10.0%  35.0%     41.5%
+Abomination          2      10        2 0.0%   0.0%      0.0%
+... omitted for brevity
 ```
 
 ## Limitations

@@ -6,8 +6,9 @@
 	Reads the list of pixel card variant keys from .data/all_pixels.txt, then checks the player's
 	CollectionState to find which of those cards have not yet received a GoldFoil or Ink split.
 	Probability of earning Ink/Gold on the next split is calculated from two independent components:
-	  1. Base 10% protected chance (active from the 4th split onward)
-	  2. Mastery % — the Rare Finish drop rate for the card's Character Mastery Level
+	  1. Base 10% protected chance (active from the 4th split onward, splits >= 4)
+	  2. Mastery % — the Ultimate Finish drop rate for the card's Character Mastery Level
+	     (Ink and Gold are Ultimate Finishes; only available when splits >= 3)
 	Combined chance: Base% + (1 - Base%) x Mastery%
 
 .OUTPUTS
@@ -19,6 +20,7 @@
 	Version: 1.2 - snaptools2023 - 2026-03-18 - Add Ink/Gold probability based on infinity-splits.md rules
 	Version: 1.3 - snaptools2023 - 2026-03-18 - Update probability to flat 10% rule from official source
 	Version: 1.4 - snaptools2023 - 2026-03-18 - Add Character Mastery Level and mastery-based finish rate
+	Version: 1.5 - snaptools2023 - 2026-05-26 - Fix: use Ultimate Finish rates (not Rare); protection starts at 4th split
 
 	* The data files seem to only refresh after starting a new game or restarting the app.
 	  So, to get a fresh list, you need to do one of those things.
@@ -33,29 +35,31 @@
 
 # ---------------------------------------------------------------------------
 # Returns the base protected probability (0.0-1.0) of rolling Ink or Gold.
-# Rule: flat 10% per split starting from the 4th split (Splits >= 3).
+# Rule: flat 10% per split starting from the 4th split (Splits >= 4).
+#   (Ink/Gold only appear after 3rd split, but the 10% protection is separate
+#   and kicks in one split later, at the 4th split onward.)
 # ---------------------------------------------------------------------------
 function Get-BaseInkGoldChance {
 	param ([int]$splits)
-	if ($splits -lt 3) { return 0.0 }
+	if ($splits -lt 4) { return 0.0 }
 	return 0.10
 }
 
 # ---------------------------------------------------------------------------
-# Returns the Rare Finish drop rate for a given Character Mastery Level.
-# Uses a step function matching the four bracket columns in infinity-splits.md.
-#   Level  1-9  -> 54%
-#   Level 10-19 -> 35%
-#   Level 20-29 -> 21%
-#   Level 30+   -> 16%
-# Gold and Ink are available through this pool only when splits >= 3.
+# Returns the Ultimate Finish drop rate for a given Character Mastery Level.
+# Ink and Gold are Ultimate Finishes. Rates from Character Mastery table:
+#   Level  1-9  -> 46%
+#   Level 10-19 -> 41%
+#   Level 20-29 -> 47%
+#   Level 30+   -> 50%
+# Ultimate Finishes are available only when splits >= 3.
 # ---------------------------------------------------------------------------
 function Get-MasteryFinishRate {
 	param ([int]$masteryLevel)
-	if     ($masteryLevel -ge 30) { return 0.16 }
-	elseif ($masteryLevel -ge 20) { return 0.21 }
-	elseif ($masteryLevel -ge 10) { return 0.35 }
-	else                          { return 0.54 }
+	if     ($masteryLevel -ge 30) { return 0.50 }
+	elseif ($masteryLevel -ge 20) { return 0.47 }
+	elseif ($masteryLevel -ge 10) { return 0.41 }
+	else                          { return 0.46 }
 }
 
 # ---------------------------------------------------------------------------

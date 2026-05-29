@@ -7,7 +7,11 @@ Misc scripts for marvel snap.
 * [List-CardsAndBoosters.ps1](#list-cardsandboostersps1)
 * [List-CardsToUpgrade.ps1](#list-cardstoupgradeps1)
 * [List-CardsToUpgrade-wip.ps1](#list-cardstoupgradewipps1)
+* [List-MissingPixels.ps1](#list-missingpixelsps1)
+* [List-PixelsWithSplits.ps1](#list-pixelswithsplitsps1)
 * [List-PixelsWithoutSplits.ps1](#list-pixelswithoutsplitsps1)
+* [Enable-Emotes.ps1](#enable-emotesps1)
+* [Disable-Emotes.ps1](#disable-emotesps1)
 
 ## Todo/coming soon - screenshots of html output
 
@@ -244,6 +248,87 @@ TheCollector requires 50 boosters to upgrade from UltraLegendary to Infinity for
 AmericaChavez requires 50 boosters to upgrade from UltraLegendary to Infinity for 500 credits
 ```
 
+## List-MissingPixels.ps1
+
+### What this script does.
+
+Powershell script to list all Pixel variant cards that are **not** in your collection, so you can see what you're still missing.  It compares your owned variants against a comprehensive list of every known Pixel variant from snap.fan.
+
+### How does it work?
+
+This script looks at only your local files.  It does not send or receive data from any server.
+
+The files it looks at are:
+
+* '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod\CollectionState.json'
+* '.data\all_pixels.txt' (list of all known Pixel variant keys from snap.fan)
+
+CollectionState.json is parsed to identify which Pixel variants you own.  `all_pixels.txt` contains every known Pixel `ArtVariantDefId` (e.g. `Abomination_01`).  Any variant in the master list that is not found in your collection is reported as missing.
+
+To refresh the master list, visit the snap.fan Pixel variants pages (paginated).
+
+### Example
+
+```
+PS > .\List-MissingPixels.ps1
+
+================================================================
+  Missing Pixel Variants
+================================================================
+  Total pixel variants on snap.fan : 213
+  Owned pixel variants              : 68
+  MISSING pixel variants            : 145
+  % owned                           : 31.9%
+================================================================
+
+Missing pixel variants (145):
+
+ArtVariantDefId
+---------------
+Abomination_01
+AbsorbingMan_01
+AdamWarlock_01
+... omitted for brevity
+```
+
+## List-PixelsWithSplits.ps1
+
+### What this script does.
+
+Powershell script to list Pixel variant cards that **have already** earned a GoldFoil or Ink infinity split.  This is the inverse of `List-PixelsWithoutSplits.ps1` — it shows your "done" Pixel cards.
+
+### How does it work?
+
+This script looks at only your local files.  It does not send or receive data from any server.
+
+The files it looks at are:
+
+* '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod\CollectionState.json'
+* '\AppData\LocalLow\Second Dinner\SNAP\Standalone\States\nvprod\CharacterMasteryState.json'
+* '.data\all_pixels.txt' (list of all known Pixel variant keys)
+
+CollectionState.json is parsed to identify which Pixel variants you own, how many times each base card has been split (total), and specifically how many of those splits resulted in GoldFoil or Ink surface effects.
+
+CharacterMasteryState.json is parsed to get the Character Mastery Level for each card.
+
+Cards are sorted by total splits descending, then alphabetically for ties.
+
+### Example
+
+```
+PS > .\List-PixelsWithSplits.ps1
+Pixel cards with a GoldFoil or Ink split (18 of 213):
+
+CardDefId       Splits Gold Ink Mastery Variants
+---------       ------ ---- --- ------- --------
+AgathaHarkness      23    5   3      30       14
+BlueMarvel          20    2   3      30       11
+AmericaChavez       20    2   2      30        9
+Sunspot             17    3   2      30       16
+Scorpion            16    1   0      30        8
+... omitted for brevity
+```
+
 ## List-PixelsWithoutSplits.ps1
 
 ### What this script does.
@@ -262,12 +347,12 @@ The files it looks at are:
 
 CollectionState.json is parsed to identify which Pixel variants you own, how many times each base card has been split, and how many variants you have for each card.
 
-CharacterMasteryState.json is parsed to get the Character Mastery Level for each card, which determines the Rare Finish drop rate.
+CharacterMasteryState.json is parsed to get the Character Mastery Level for each card, which determines the Ultimate Finish drop rate.
 
 The probability of earning Gold or Ink on the next split is calculated from two independent components:
 
 * **Base %** — A flat 10% protected chance that applies from the 4th split onward (0% before that).
-* **Mastery %** — The Rare Finish drop rate for the card's Character Mastery Level bracket (54% at level 1-9, 35% at 10-19, 21% at 20-29, 16% at 30+). Only applies when splits >= 3.
+* **Mastery %** — The Ultimate Finish drop rate for the card's Character Mastery Level bracket (54% at level 1-9, 35% at 10-19, 21% at 20-29, 16% at 30+). Only applies when splits >= 3.
 * **Combined %** — `Base% + (1 - Base%) x Mastery%`
 
 Cards are sorted from most likely to least likely to earn Gold or Ink on the next split.
@@ -287,6 +372,48 @@ Magik                4      16        4 10.0%  35.0%     41.5%
 MrSinister           4      14        6 10.0%  35.0%     41.5%
 Abomination          2      10        2 0.0%   0.0%      0.0%
 ... omitted for brevity
+```
+
+## Enable-Emotes.ps1
+
+### What this script does.
+
+Enables Marvel Snap emotes by restoring the `emotes_assets_all_*.bundle` files that were previously renamed with a `.rename` suffix. This is the undo counterpart to `Disable-Emotes.ps1`.
+
+### How does it work?
+
+This script looks at only your local files. It does not send or receive data from any server.
+
+1. Reads the Steam installation path from the registry (`HKLM` and `HKCU`).
+2. Parses `libraryfolders.vdf` to find all Steam library folders.
+3. For each library, navigates to `steamapps\common\MARVEL SNAP\SNAP_Data\StreamingAssets\aa\StandaloneWindows64\MockCdn`.
+4. Finds all files matching `emotes_assets_all_*.bundle.rename` and removes the `.rename` suffix.
+
+### Example
+
+```
+PS > .\Enable-Emotes.ps1
+```
+
+## Disable-Emotes.ps1
+
+### What this script does.
+
+Disables Marvel Snap emotes by renaming `emotes_assets_all_*.bundle` files with a `.rename` suffix so the game cannot find them. Use `Enable-Emotes.ps1` to reverse this.
+
+### How does it work?
+
+This script looks at only your local files. It does not send or receive data from any server.
+
+1. Reads the Steam installation path from the registry (`HKLM` and `HKCU`).
+2. Parses `libraryfolders.vdf` to find all Steam library folders.
+3. For each library, navigates to `steamapps\common\MARVEL SNAP\SNAP_Data\StreamingAssets\aa\StandaloneWindows64\MockCdn`.
+4. Finds all files matching `emotes_assets_all_*.bundle` and appends a `.rename` suffix.
+
+### Example
+
+```
+PS > .\Disable-Emotes.ps1
 ```
 
 ## Limitations

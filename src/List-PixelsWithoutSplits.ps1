@@ -21,6 +21,7 @@
 	Version: 1.3 - snaptools2023 - 2026-03-18 - Update probability to flat 10% rule from official source
 	Version: 1.4 - snaptools2023 - 2026-03-18 - Add Character Mastery Level and mastery-based finish rate
 	Version: 1.5 - snaptools2023 - 2026-05-26 - Fix: use Ultimate Finish rates (not Rare); protection starts at 4th split
+	Version: 1.6 - snaptools2023 - 2026-07-06 - Sort: Combined%, Mastery%, Splits, Mastery level, Variants (all desc)
 
 	* The data files seem to only refresh after starting a new game or restarting the app.
 	  So, to get a fresh list, you need to do one of those things.
@@ -156,20 +157,21 @@ foreach ($pixelKey in $pixelVariantKeys) {
 		$combinedChance = Get-CombinedInkGoldChance -splits $totalSplits -masteryLevel $masteryLevel
 
 		$results += [PSCustomObject] @{
-			CardDefId    = $cardDefId
-			Splits       = $totalSplits
-			Mastery      = $masteryLevel
-			Variants     = $totalVariants
-			'Base %'     = '{0:P1}' -f $baseChance
-			'Mastery %'  = '{0:P1}' -f $masteryChance
-			'Combined %' = '{0:P1}' -f $combinedChance
-			_SortKey     = $combinedChance
+			CardDefId     = $cardDefId
+			Splits        = $totalSplits
+			Mastery       = $masteryLevel
+			Variants      = $totalVariants
+			'Base %'      = '{0:P1}' -f $baseChance
+			'Mastery %'   = '{0:P1}' -f $masteryChance
+			'Combined %'  = '{0:P1}' -f $combinedChance
+			_SortCombined = $combinedChance
+			_SortMastery  = $masteryChance
 		}
 	}
 }
 
-# sort by combined probability descending, then alphabetically for ties
-$results = @($results | Sort-Object -Property @{Expression = '_SortKey'; Descending = $true}, CardDefId)
+# sort: Combined% desc, Mastery% desc, Splits desc, Mastery level desc, Variants desc
+$results = @($results | Sort-Object -Property @{Expression = '_SortCombined'; Descending = $true}, @{Expression = '_SortMastery'; Descending = $true}, @{Expression = 'Splits'; Descending = $true}, @{Expression = 'Mastery'; Descending = $true}, @{Expression = 'Variants'; Descending = $true})
 
 Write-Host "Pixel cards without a GoldFoil or Ink split ($($results.Count) of $($pixelVariantKeys.Count)):"
 Write-Host ""
